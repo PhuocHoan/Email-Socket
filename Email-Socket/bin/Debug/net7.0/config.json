@@ -1,0 +1,32 @@
+{
+    "General": {
+        "Username": "Phuoc Hoan <phuochoan@gmail.com>",
+        "Password": "12345678",
+        "MailServer": "127.0.0.1",
+        "SMTP": 25,
+        "POP3": 110,
+        "Autoload": 10
+    },
+    "Filter": [
+        {
+          "criteria": "From",
+          "values": ["ahihi@testing.com", "ahuu@testing.com"],
+          "folder": "Project"
+        },
+        {
+          "criteria": "Subject",
+          "values": ["urgent", "ASAP"],
+          "folder": "Important"
+        },
+        {
+          "criteria": "Content",
+          "values": ["report", "meeting"],
+          "folder": "Work"
+        },
+        {
+          "criteria": "Spam",
+          "values": ["virus", "hack", "crack"],
+          "folder": "Spam"
+        }
+      ]
+}
