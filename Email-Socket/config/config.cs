@@ -1,26 +1,34 @@
-using System.Collections.Generic;
 using System.Text.Json;
-
-using System;
 
 namespace Config
 {
-
+    class GeneralSettings {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public string? MailServer { get; set; }
+        public short SmtpPort { get; set; }
+        public short Pop3Port { get; set; }
+        public short AutoLoad { get; set; }
+    }
+    class Filter {
+        public  string? Criteria { get; set; }
+        public  List<string>? Values { get; set; }
+        public  string? Folder { get; set; }
+    }
     class ConfigJson
     {
-        public class Source{
+        public static GeneralSettings? General { get; set; }
+        public static List<Filter>? Filters { get; set; }
 
+        public static ConfigJson Load(string file)
+        {
+            using FileStream stream = new(file, FileMode.Open, FileAccess.Read);
+            return JsonSerializer.Deserialize<ConfigJson>(stream)!;
         }
-        public void loadJson() {
-            // get config.json path on your local computer
-            string fullPath = Path.GetFullPath("config.json");
-            // read file config.json
-            using (StreamReader read = new StreamReader(fullPath))
-            {
-                Dictionary<string, object> items = JsonSerializer.Deserialize<Dictionary<string, object>>(read.ReadToEnd())!;
-                general = (Dictionary<string, string>)items["General"];
-                filter = (List<Dictionary<string, string>>)items["Filter"];
-            }
+        public static void Save(string file, ConfigJson config)
+        {
+            using FileStream stream = new(file, FileMode.Truncate, FileAccess.Write);
+            JsonSerializer.Serialize(stream, config);
         }
     }
 }

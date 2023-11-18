@@ -1,23 +1,25 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using SMTP;
+using Config;
 
 namespace POP3
 {
     class Pop3_Client
     {
         public void Connection() {
-            // Replace these values with your POP3 server information
-            IPAddress pop3Server = IPAddress.Parse("127.0.0.1");
-            int pop3Port = 110;
-            string username = "phuochoan17032004@gmail.com";
-            string password = "hoandeptrai2004";
+            // Get MailServer, POP3 port
+            IPAddress MailServer = IPAddress.Parse(ConfigJson.General!.MailServer!);
+            short pop3Port = ConfigJson.General.Pop3Port;
+
+            // Get Username, Password
+            string? tmp = ConfigJson.General.Username;
+            string username = tmp!.Substring(0, tmp.IndexOf("<") - 2);
+            string password = ConfigJson.General.Password!;
 
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             // Connect to the POP3 server
-            socket.Connect(pop3Server, pop3Port);
+            socket.Connect(MailServer, pop3Port);
 
             // Check if the connection is successful
             if (!socket.Connected)
@@ -53,7 +55,7 @@ namespace POP3
             int messageCount = int.Parse(statResponse!.Split(' ')[1]);
 
             // Retrieve each email
-            for (int i = 1; i <= 1; i++)
+            for (int i = 1; i <= messageCount; i++)
             {
                 // Send the RETR command to retrieve the i-th message
                 writer.WriteLine($"RETR {i}");

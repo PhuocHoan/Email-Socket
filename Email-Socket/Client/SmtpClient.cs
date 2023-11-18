@@ -1,25 +1,30 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.IO;
+using Config;
 
 namespace SMTP
 {
     class Smtp_Client
     {
         public void Connection() {
+            // Get file json path
+            string file = Path.GetFullPath("Config.json");
+            ConfigJson.Load(file);
             // Specify the SMTP server and port
-            IPAddress smtpServer = IPAddress.Parse("127.0.0.1");
-            int smtpPort = 25;
-
-            // Specify sender and recipient email addresses
-            string from = "your_email@example.com";
-            string to = "phuochoan17032004@gmail.com";
+            IPAddress MailServer = IPAddress.Parse(ConfigJson.General!.MailServer!);
+            short SmtpPort = ConfigJson.General.SmtpPort;
 
             // Create a socket and connect to the SMTP server
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            using Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(MailServer, SmtpPort);
 
-            socket.Connect(smtpServer, smtpPort);
+            // Specify sender and recipient email addresses
+            string tmp = ConfigJson.General.Username!;
+            string from = tmp.Substring(tmp.IndexOf('<'), tmp.Length - 1 - tmp.IndexOf('<'));
+            string to = "phuochoan17032004@gmail.com, ahihi@testing.com";
+            string[] Recipient = AdequateMail(to);
 
             // Check if the connection is successful
             if (!socket.Connected)
@@ -28,16 +33,17 @@ namespace SMTP
                 return;
             }
 
-            NetworkStream networkStream = new NetworkStream(socket);
-            StreamReader reader = new StreamReader(networkStream, Encoding.ASCII);
-            StreamWriter writer = new StreamWriter(networkStream, Encoding.ASCII);
+            using NetworkStream networkStream = new NetworkStream(socket);
+            using StreamReader reader = new StreamReader(networkStream, Encoding.ASCII);
+            using StreamWriter writer = new StreamWriter(networkStream, Encoding.ASCII);
+            writer.AutoFlush = true;
+
             // Read the welcome message from the server
             string? welcomeMessage = reader.ReadLine();
             Console.WriteLine(welcomeMessage);
 
             // Send the EHLO command to the server
             writer.WriteLine("EHLO example.com");
-            writer.Flush();
 
             // Read and print the response
             string? ehloResponse = reader.ReadLine();
@@ -45,7 +51,6 @@ namespace SMTP
 
             // Send the MAIL FROM command
             writer.WriteLine($"MAIL FROM:<{from}>");
-            writer.Flush();
 
             // Read and print the response
             string? mailFromResponse = reader.ReadLine();
@@ -53,7 +58,6 @@ namespace SMTP
 
             // Send the RCPT TO command
             writer.WriteLine($"RCPT TO:<{to}>");
-            writer.Flush();
 
             // Read and print the response
             string? rcptToResponse = reader.ReadLine();
@@ -61,11 +65,12 @@ namespace SMTP
 
             // Send the DATA command
             writer.WriteLine("DATA");
-            writer.Flush();
 
             // Read and print the response
             string? dataResponse = reader.ReadLine();
             Console.WriteLine(dataResponse);
+
+            /* Send the email content */            
 
             // Read and print the response
             string? sendDataResponse = reader.ReadLine();
@@ -73,7 +78,6 @@ namespace SMTP
 
             // Send the QUIT command
             writer.WriteLine("QUIT");
-            writer.Flush();
 
             // Read and print the response
             string? quitResponse = reader.ReadLine();
@@ -84,16 +88,13 @@ namespace SMTP
             reader.Close();
             socket.Close();
         }
-        void MailContent() {
-            // Send the email content
-            // writer.WriteLine("Subject: Test Email");
-            // writer.WriteLine("From: " + from);
-            // writer.WriteLine("To: " + to);
-            // writer.WriteLine("Content-Type: text/plain; charset=utf-8");
-            // writer.WriteLine();
-            // writer.WriteLine("This is a test email sent using raw sockets in C#.");
-            // writer.WriteLine('.');
-            // writer.Flush();
+        private string[] AdequateMail(string mail) {
+            // To get each mail receiver adequately
+            string[] mails = mail.Split(",");
+            for (int i = 0; i < mails.Length; ++i) {
+                mails[i] = mails[i].Trim();
+            }
+            return mails;
         }
     }
 }
