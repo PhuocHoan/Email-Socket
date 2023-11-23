@@ -15,3 +15,17 @@ C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\HCMUS\2nd year\4th Semester\Computer Ne
 C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\HCMUS\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Email-Socket\bin\Debug\net7.0\Newtonsoft.Json.dll
 C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\HCMUS\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.csproj.AssemblyReference.cache
 C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\HCMUS\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.csproj.CopyComplete
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.GeneratedMSBuildEditorConfig.editorconfig
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.AssemblyInfoInputs.cache
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.AssemblyInfo.cs
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.csproj.CoreCompileInputs.cache
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.dll
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\refint\Email-Socket.dll
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.pdb
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\bin\Debug\net7.0\Email-Socket.exe
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\bin\Debug\net7.0\Email-Socket.deps.json
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\bin\Debug\net7.0\Email-Socket.runtimeconfig.json
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\bin\Debug\net7.0\Email-Socket.dll
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\bin\Debug\net7.0\Email-Socket.pdb
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\Email-Socket.genruntimeconfig.cache
+D:\Uni\Year 2\1st semester\Computer Networking\Đồ án\Socket Programming\Hoan\Email-Socket\Email-Socket\obj\Debug\net7.0\ref\Email-Socket.dll

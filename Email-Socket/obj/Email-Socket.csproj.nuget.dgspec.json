@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Phuoc Hoan\\OneDrive - VNU-HCMUS\\HCMUS\\2nd year\\4th Semester\\Computer Networking\\Lab\\Project1 Socket\\Email-Socket\\Email-Socket\\Email-Socket.csproj": {}
+    "D:\\Uni\\Year 2\\1st semester\\Computer Networking\\Đồ án\\Socket Programming\\Hoan\\Email-Socket\\Email-Socket\\Email-Socket.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Phuoc Hoan\\OneDrive - VNU-HCMUS\\HCMUS\\2nd year\\4th Semester\\Computer Networking\\Lab\\Project1 Socket\\Email-Socket\\Email-Socket\\Email-Socket.csproj": {
+    "D:\\Uni\\Year 2\\1st semester\\Computer Networking\\Đồ án\\Socket Programming\\Hoan\\Email-Socket\\Email-Socket\\Email-Socket.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Phuoc Hoan\\OneDrive - VNU-HCMUS\\HCMUS\\2nd year\\4th Semester\\Computer Networking\\Lab\\Project1 Socket\\Email-Socket\\Email-Socket\\Email-Socket.csproj",
+        "projectUniqueName": "D:\\Uni\\Year 2\\1st semester\\Computer Networking\\Đồ án\\Socket Programming\\Hoan\\Email-Socket\\Email-Socket\\Email-Socket.csproj",
         "projectName": "Email-Socket",
-        "projectPath": "C:\\Users\\Phuoc Hoan\\OneDrive - VNU-HCMUS\\HCMUS\\2nd year\\4th Semester\\Computer Networking\\Lab\\Project1 Socket\\Email-Socket\\Email-Socket\\Email-Socket.csproj",
-        "packagesPath": "C:\\Users\\Phuoc Hoan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Phuoc Hoan\\OneDrive - VNU-HCMUS\\HCMUS\\2nd year\\4th Semester\\Computer Networking\\Lab\\Project1 Socket\\Email-Socket\\Email-Socket\\obj\\",
+        "projectPath": "D:\\Uni\\Year 2\\1st semester\\Computer Networking\\Đồ án\\Socket Programming\\Hoan\\Email-Socket\\Email-Socket\\Email-Socket.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Uni\\Year 2\\1st semester\\Computer Networking\\Đồ án\\Socket Programming\\Hoan\\Email-Socket\\Email-Socket\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Phuoc Hoan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -53,7 +55,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,32 +1,45 @@
 {
-    "General": {
-        "Username": "Phuoc Hoan <phuochoan@gmail.com>",
-        "Password": "12345678",
-        "MailServer": "127.0.0.1",
-        "SMTP": 25,
-        "POP3": 110,
-        "Autoload": 10
+  "General": {
+    "Username": "Le Van A <levana@gmail.com>",
+    "Password": "levana",
+    "MailServer": "127.0.0.1",
+    "SmtpPort": "2225",
+    "Pop3Port": 3335,
+    "AutoLoad": 10
+  },
+  "Filters": [
+    {
+      "Criteria": "From",
+      "Values": [
+        "ahihi@testing.com",
+        "ahuu@testing.com"
+      ],
+      "Folder": "Project"
     },
-    "Filter": [
-        {
-          "criteria": "From",
-          "values": ["ahihi@testing.com", "ahuu@testing.com"],
-          "folder": "Project"
-        },
-        {
-          "criteria": "Subject",
-          "values": ["urgent", "ASAP"],
-          "folder": "Important"
-        },
-        {
-          "criteria": "Content",
-          "values": ["report", "meeting"],
-          "folder": "Work"
-        },
-        {
-          "criteria": "Spam",
-          "values": ["virus", "hack", "crack"],
-          "folder": "Spam"
-        }
-      ]
+    {
+      "Criteria": "Subject",
+      "Values": [
+        "urgent",
+        "ASAP"
+      ],
+      "Folder": "Important"
+    },
+    {
+      "Criteria": "Content",
+      "Values": [
+        "report",
+        "meeting"
+      ],
+      "Folder": "Work"
+    },
+    {
+      "Criteria": "Spam",
+      "Values": [
+        "virus",
+        "hack",
+        "crack"
+      ],
+      "Folder": "Spam"
+    }
+  ]
 }

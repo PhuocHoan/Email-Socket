@@ -95,11 +95,11 @@ namespace SMTP
                 streamWriter.Write(Mime.GetMimePartHeader(randomBoundary, null, false));
                 streamWriter.WriteLine(email.Body);
                 streamWriter.WriteLine();
-                foreach (string attachment in email.Attachments)
+                foreach (Attachment attachment in email.Attachments)
                 {
                     // Send header of each files
-                    streamWriter.Write(Mime.GetMimePartHeader(randomBoundary, attachment));
-                    SendFile(attachment);
+                    streamWriter.Write(Mime.GetMimePartHeader(randomBoundary, attachment.Directory));
+                    SendFile(attachment.Directory);
                 }
             }
             streamWriter.WriteLine();
