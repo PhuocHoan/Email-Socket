@@ -94,7 +94,7 @@ namespace EmailHandler
                 header.AppendLine($"Content-Type: text/plain; charset=UTF-8; format=flowed");
                 header.AppendLine($"Content-Transfer-Encoding: 7bit");
             }
-            else 
+            else
                 header.AppendLine($"Content-Type: multipart/mixed; boundary=\"{boundary}\"");
             header.AppendLine();
 
@@ -104,13 +104,13 @@ namespace EmailHandler
         public static string GetMimePartHeader(string boundary, string? fileName, bool isFile = true)
         {
             StringBuilder header = new StringBuilder();
-        
+
             header.AppendLine($"{boundary}");
             if (isFile)
             {
                 header.AppendLine($"Content-Type: {GetFileContentType(fileName!)}; name=\"{Path.GetFileName(fileName)}\"");
                 header.AppendLine($"Content-Disposition: attachment; filename=\"{Path.GetFileName(fileName)}\"");
-                header.AppendLine("Content-Transfer-Encoding: base64");
+                header.AppendLine($"Content-Transfer-Encoding: {(GetFileContentType(fileName!).Equals("text/plain") ? "7bit" : "base64")}");
             }
             else
             {
@@ -121,40 +121,6 @@ namespace EmailHandler
 
             return header.ToString();
         }
-
-        // public static string GetFileHeader(Email email)
-        // {
-        //     StringBuilder header = new StringBuilder();
-        //     string emailContentType = GetEmailContentType(email);
-        //     header.AppendLine($"Content-Type: {emailContentType}{(emailContentType.Equals("multipart/mixed") ? "; boundary=\"0urte3m~cust0m1zedb0und3ry\"" : "")}");
-        //     header.AppendLine();
-
-        //     if (emailContentType.Equals("text/plain"))
-        //         header.AppendLine(email.Body);
-        //     else
-        //     {
-        //         header.AppendLine("--0urte3m~cust0m1zedb0und3ry");
-        //         header.AppendLine("Content-Type: text/plain; charset=us-ascii");
-        //         header.AppendLine("Content-Transfer-Encoding: 7bit");
-        //         header.AppendLine();
-        //         header.AppendLine(email.Body);
-        //         header.AppendLine();
-
-        //         foreach (Attachment file in email.Attachments)
-        //         {
-        //             header.AppendLine("--0urte3m~cust0m1zedb0und3ry");
-        //             header.AppendLine($"Content-Type: {GetFileContentType(file.FileDir)}; name = \"{Path.GetFileName(file.FileDir)}\"");
-        //             header.AppendLine("Content-Transfer-Encoding: base64");
-        //             header.AppendLine();
-        //             header.AppendLine(Convert.ToBase64String(file.Data));
-        //             header.AppendLine();
-        //         }
-
-        //         content.AppendLine("--0urte3m~cust0m1zedb0und3ry--");
-        //     }
-
-        //     return content.ToString();
-        // }
 
         // public static Email MimeParser(string mimeMessage)
         // {
@@ -269,73 +235,73 @@ namespace EmailHandler
         //     return "";
         // }
 
-        // public static Email MimeParser(string mime)
-        // {
-        //     string[] lines = mime.Split("\r\n");
-        //     int i = 0; // i is index of lines
-        //     string contentType = "";
-        //     if (mime.Equals("Content-Type: multipart/mixed; boundary=\"--LLVJuUtfdf3nwd0phoib0wRo"))
-        //     {
-        //         contentType = lines[i++];
-        //     }
-        //     string messageID = lines[i++].Substring(lines[i].IndexOf("<") + 1, lines[i].IndexOf(">") - lines[i].IndexOf("<") - 1);
-        //     string dateTime = lines[i].Substring(lines[i].IndexOf(" ") + 1);
-        //     i += 3;
-        //     string Content_Languague = lines[i].Substring(lines[i++].IndexOf(" ") + 1);
-        //     string[] to = null!, cc = null!, bcc = null!;
-        //     if (lines[i].Contains("To: "))
-        //     {
-        //         lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
-        //         to = lines[i++].Split(", ");
-        //     }
-        //     if (lines[i].Contains("CC: "))
-        //     {
-        //         lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
-        //         cc = lines[i++].Split(", ");
-        //     }
-        //     if (lines[i].Contains("BCC: "))
-        //     {
-        //         lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
-        //         bcc = lines[i++].Split(", ");
-        //     }
-        //     string from = lines[i].Substring(lines[i++].IndexOf(" ") + 1);
-        //     string subject = lines[i++].Substring(lines[i++].IndexOf(" ") + 1);
-        //     if (lines[i].Contains("Content-Type: text/plain; charset=UTF-8; format=flowed"))
-        //     {
-        //         i += 3;
-        //     }
-        //     else
-        //     {
-        //         i += 6;
-        //     }
-        //     string body = "";
-        //     while (lines[i] != "--LLVJuUtfdf3nwd0phoib0wRo")
-        //     {
-        //         body += lines[i++];
-        //     }
-        //     body = body.Remove(body.LastIndexOf("\r\n"));
-        //     Email email = new Email(messageID, dateTime, Content_Languague, from, to!, cc!, bcc!, subject, body);
-        //     if (contentType.Contains("multipart/mixed"))
-        //     {
-        //         while (!lines[i].Equals("--LLVJuUtfdf3nwd0phoib0wRo--"))
-        //         {
-        //             string fileName = lines[++i].Substring(lines[i].IndexOf("\"") + 1, lines[i].Length - 2 - lines[i].IndexOf("\""));
-        //             string fileBody = "";
-        //             i += 4;
-        //             while (lines[i] != "--LLVJuUtfdf3nwd0phoib0wRo")
-        //             {
-        //                 fileBody += lines[i++];
-        //             }
-        //             Attachment attachment = new Attachment
-        //             {
-        //                 FileDir = fileName,
-        //                 Data = Convert.FromBase64String(fileBody)
-        //             };
-        //             email.Attachments.Add(attachment);
-        //         }
-        //     }
-        //     return email;
-        // }
+        public static Email MimeParser(string mime)
+        {
+            string[] lines = mime.Split("\r\n");
+            int i = 0; // i is index of lines
+            string contentType = "";
+            if (mime.Equals("Content-Type: multipart/mixed; boundary=\"--LLVJuUtfdf3nwd0phoib0wRo"))
+            {
+                contentType = lines[i++];
+            }
+            string messageID = lines[i++].Substring(lines[i].IndexOf("<") + 1, lines[i].IndexOf(">") - lines[i].IndexOf("<") - 1);
+            string dateTime = lines[i].Substring(lines[i].IndexOf(" ") + 1);
+            i += 3;
+            string Content_Languague = lines[i].Substring(lines[i++].IndexOf(" ") + 1);
+            string[] to = null!, cc = null!, bcc = null!;
+            if (lines[i].Contains("To: "))
+            {
+                lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
+                to = lines[i++].Split(", ");
+            }
+            if (lines[i].Contains("CC: "))
+            {
+                lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
+                cc = lines[i++].Split(", ");
+            }
+            if (lines[i].Contains("BCC: "))
+            {
+                lines[i] = lines[i].Substring(lines[i].IndexOf(" ") + 1);
+                bcc = lines[i++].Split(", ");
+            }
+            string from = lines[i].Substring(lines[i++].IndexOf(" ") + 1);
+            string subject = lines[i++].Substring(lines[i++].IndexOf(" ") + 1);
+            if (lines[i].Contains("Content-Type: text/plain; charset=UTF-8; format=flowed"))
+            {
+                i += 3;
+            }
+            else
+            {
+                i += 6;
+            }
+            string body = "";
+            while (lines[i] != "--LLVJuUtfdf3nwd0phoib0wRo")
+            {
+                body += lines[i++];
+            }
+            body = body.Remove(body.LastIndexOf("\r\n"));
+            Email email = new Email(messageID, dateTime, Content_Languague, from, to!, cc!, bcc!, subject, body);
+            if (contentType.Contains("multipart/mixed"))
+            {
+                while (!lines[i].Equals("--LLVJuUtfdf3nwd0phoib0wRo--"))
+                {
+                    string fileName = lines[++i].Substring(lines[i].IndexOf("\"") + 1, lines[i].Length - 2 - lines[i].IndexOf("\""));
+                    string fileBody = "";
+                    i += 4;
+                    while (lines[i] != "--LLVJuUtfdf3nwd0phoib0wRo")
+                    {
+                        fileBody += lines[i++];
+                    }
+                    Attachment attachment = new Attachment
+                    {
+                        FileDir = fileName,
+                        Data = Convert.FromBase64String(fileBody)
+                    };
+                    email.Attachments.Add(attachment);
+                }
+            }
+            return email;
+        }
 
     }
 }
