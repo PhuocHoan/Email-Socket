@@ -14,6 +14,7 @@ namespace SMTP
         private Socket socket;
         private NetworkStream? networkStream;
         private StreamWriter? streamWriter;
+        private StreamReader? streamReader;
         public IPAddress server;
         public short port;
         public ConfigJson config;
@@ -29,7 +30,7 @@ namespace SMTP
             socket.Connect(server, port);
             networkStream = new NetworkStream(socket);
             streamWriter = new StreamWriter(networkStream, Encoding.ASCII) { AutoFlush = true };
-
+            streamReader = new StreamReader(networkStream, Encoding.ASCII);
             // Check if the connection is successful
             if (!socket.Connected)
                 throw new Exception("Failed connecting to server!");
@@ -38,29 +39,25 @@ namespace SMTP
         public void Close()
         {
             streamWriter.WriteLine("QUIT");
+            Console.WriteLine(streamReader!.ReadLine());
             networkStream!.Close();
+            streamReader!.Close();
             streamWriter!.Close();
             socket.Close();
         }
-
-        // private string[] AdequateMail(string mail)
-        // {
-        //     // To get each mail receiver adequately
-        //     string[] mails = mail.Split(",");
-        //     for (int i = 0; i < mails.Length; ++i)
-        //     {
-        //         mails[i] = mails[i].Trim();
-        //     }
-        //     return mails;
-        // }
 
         public void SendEmail(Email email)
         {
             if (!socket.Connected)
                 throw new Exception("Haven't connected to the server!");
 
+            string? response;
+            Console.WriteLine(streamReader.ReadLine());
             streamWriter!.WriteLine("EHLO example.com");
-            streamWriter.WriteLine($"MAIL FROM <{email.From}>");
+            Console.WriteLine(streamReader.ReadLine());
+            
+            streamWriter.WriteLine($"MAIL FROM: <{email.From}>");
+            Console.WriteLine(streamReader.ReadLine());
 
             SortedSet<string> peopleToSend = new SortedSet<string>();
             foreach (string to in email.To)
@@ -70,10 +67,14 @@ namespace SMTP
             foreach (string Bcc in email.Bcc)
                 peopleToSend.Add(Bcc);
             foreach (string to in peopleToSend)
-                streamWriter.WriteLine($"RCPT TO {to}");
-
+            {
+                streamWriter.WriteLine($"RCPT TO: {to}");
+                Console.WriteLine(streamReader!.ReadLine());
+            }
+            
             // Begin to send email content
             streamWriter.WriteLine("DATA");
+            Console.WriteLine(streamReader!.ReadLine());
             string randomBoundary = string.Format("----------{0:N}", Guid.NewGuid());
             streamWriter!.WriteLine(Mime.GetMainHeader(email, randomBoundary));
             
@@ -90,9 +91,11 @@ namespace SMTP
                     streamWriter.WriteLine(Mime.GetMimePartHeader(randomBoundary, attachment.Directory));
                     SendFile(attachment.Directory);
                 }
+                streamWriter.WriteLine();
+                streamWriter.WriteLine($"{randomBoundary}--");
             }
-            streamWriter.WriteLine();
-            streamWriter.WriteLine($"{randomBoundary}--");
+            streamWriter.WriteLine(".");
+            Console.WriteLine(streamReader!.ReadLine());
         }
 
         private void SendFile(string filePath)

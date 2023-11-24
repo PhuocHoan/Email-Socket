@@ -7,12 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace POP3
 {
-    class Message_Box
-    {
-        // bool is to check whether the message is read
-        // string is to store the message content
-        public static List<Email>? box { get; set; }
-    }
     class Pop3_Client
     {
         private Socket socket;
@@ -42,31 +36,43 @@ namespace POP3
         }
         public void ReceiveEmail() {
             // Send the USER command
+            Console.WriteLine(streamReader.ReadLine());
             Match match = Regex.Match(config.General!.Username!, "<(.+?)>");
             streamWriter!.WriteLine($"USER {match.Groups[1].Value}");
+            Console.WriteLine(streamReader.ReadLine());
 
             // Send the PASS command
             streamWriter!.WriteLine($"PASS {config.General!.Password}");
+            Console.WriteLine(streamReader.ReadLine());
 
             // Send the STAT command to get the number of messages in the mailbox
             streamWriter!.WriteLine("STAT");
-
-            string? statResponse = streamReader!.ReadLine();
+            string? statResponse = streamReader.ReadLine();
+            Console.WriteLine(statResponse);
             // Extract the number of messages from the STAT response
             int messageCount = int.Parse(statResponse!.Split(' ')[1]);
 
-            // Retrieve each email
             for (int i = 1; i <= messageCount; i++)
             {
                 // Send the RETR command to retrieve the i-th message
                 streamWriter!.WriteLine($"RETR {i}");
-                string emailContent = streamReader.ReadToEnd();
+                Console.WriteLine(streamReader.ReadLine());
+                string message = "";
+                while (true)
+                {
+                    string? line = streamReader.ReadLine();
+                    if (line == ".")
+                        break;
+                    message += line + '\n';
+                }
+                Email email = Mime.MimeParser(message);
             }
 
         }
         public void Close()
         {
             streamWriter.WriteLine("QUIT");
+            Console.WriteLine(streamReader!.ReadLine());
             networkStream!.Close();
             streamWriter!.Close();
             streamReader!.Close();

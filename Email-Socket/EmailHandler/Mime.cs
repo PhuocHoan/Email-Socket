@@ -202,9 +202,12 @@ namespace EmailHandler
                         reader.ReadLine();
                         // Parse part body
                         StringBuilder AttachmentContent = new StringBuilder();
-                        while ((line = reader.ReadLine()) != boundary)
+                        while ((line = reader.ReadLine()) != boundary){
+                            if (line == boundary + "--") {
+                                break;
+                            }
                             AttachmentContent.Append(line);
-                        
+                        }
                         // Decode base64
                         email.Attachments[i].Data = Convert.FromBase64String(AttachmentContent.ToString());
                         // Save to file
@@ -219,8 +222,6 @@ namespace EmailHandler
                         StringBuilder body = new StringBuilder();
                         while ((line = reader.ReadLine()) != boundary)
                             body.Append(line);
-                        // Remove last 2 characters "\r\n"
-                        body.Remove(body.Length - 2, 2);
                         email.Body = body.ToString();
                     }
                 }
@@ -231,7 +232,7 @@ namespace EmailHandler
                     if (match.Success)
                     {
                         string filename = match.Groups[1].Value;
-                        email.Attachments.Add(new Attachment(@$".\{filename}"));
+                        email.Attachments.Add(new Attachment(@$"{filename}"));
                     }
                 }
             }

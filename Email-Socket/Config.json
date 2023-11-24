@@ -3,8 +3,8 @@
     "Username": "Le Van A <levana@gmail.com>",
     "Password": "levana",
     "MailServer": "127.0.0.1",
-    "SmtpPort": "2225",
-    "Pop3Port": 3335,
+    "SmtpPort": 25,
+    "Pop3Port": 110,
     "AutoLoad": 10
   },
   "Filters": [
