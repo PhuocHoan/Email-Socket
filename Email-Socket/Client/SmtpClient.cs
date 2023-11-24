@@ -48,6 +48,7 @@ namespace SMTP
 
         public void Close()
         {
+            streamWriter!.WriteLine("QUIT");
             networkStream!.Close();
             streamWriter!.Close();
             streamReader!.Close();
@@ -70,8 +71,14 @@ namespace SMTP
             if (!socket.Connected)
                 throw new Exception("Haven't connected to the server!");
 
+            string? response;
+
             streamWriter!.WriteLine("EHLO example.com");
+            response = streamReader!.ReadLine();
+            Console.WriteLine(response);
             streamWriter.WriteLine($"MAIL FROM:<{email.From}>");
+            response = streamReader!.ReadLine();
+            Console.WriteLine(response);
 
             SortedSet<string> peopleToSend = new SortedSet<string>();
             foreach (string to in email.To)
@@ -81,17 +88,24 @@ namespace SMTP
             foreach (string bcc in email.BCC)
                 peopleToSend.Add(bcc);
             foreach (string to in peopleToSend)
+            {
                 streamWriter.WriteLine($"RCPT TO:<{to}>");
+                response = streamReader!.ReadLine();
+                Console.WriteLine(response);
+            }
 
             // Begin to send email content
             streamWriter.WriteLine("DATA");
+            response = streamReader!.ReadLine();
+            Console.WriteLine(response);
             string randomBoundary = string.Format("----------{0:N}", Guid.NewGuid());
             streamWriter!.Write(Mime.GetMainHeader(email, randomBoundary));
 
             if (email.Attachments.Count == 0)
-                streamWriter.Write(email.Body);
+                streamWriter.WriteLine(email.Body);
             else
             {
+                streamWriter.WriteLine("This is a multi-part message in MIME format.");
                 streamWriter.Write(Mime.GetMimePartHeader(randomBoundary, null, false));
                 streamWriter.WriteLine(email.Body);
                 streamWriter.WriteLine();
@@ -99,28 +113,42 @@ namespace SMTP
                 {
                     // Send header of each files
                     streamWriter.Write(Mime.GetMimePartHeader(randomBoundary, attachment.Directory));
-                    SendFile(attachment.Directory);
+                    if (Mime.GetFileContentType(attachment.Directory!).Equals("text/plain"))
+                        SendFile(attachment.Directory!, true);
+                    else SendFile(attachment.Directory!);
                 }
+                streamWriter.WriteLine();
+                streamWriter.WriteLine($"--{randomBoundary}--");
             }
-            streamWriter.WriteLine();
-            streamWriter.WriteLine($"{randomBoundary}--");
             streamWriter.WriteLine(".");
+            response = streamReader!.ReadLine();
+            Console.WriteLine(response);
         }
 
-        private void SendFile(string filePath)
+        private void SendFile(string filePath, bool isText = false)
         {
             byte[] buffer = new byte[72];
 
             using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-            using (CryptoStream b64Stream = new(fileStream, new ToBase64Transform(), CryptoStreamMode.Read))
-            {
-                int read;
-                while ((read = b64Stream.Read(buffer)) != 0)
+                if (!isText)
                 {
-                    networkStream.Write(buffer, 0, read);
+                    using (CryptoStream b64Stream = new(fileStream, new ToBase64Transform(), CryptoStreamMode.Read))
+                    {
+                        int read;
+                        while ((read = b64Stream.Read(buffer)) != 0)
+                        {
+                            networkStream.Write(buffer, 0, read);
+                            networkStream.Write("\r\n"u8.ToArray());
+                        }
+                    }
+                }
+                else
+                {
+                    int read;
+                    while ((read = fileStream.Read(buffer)) != 0)
+                        networkStream.Write(buffer, 0, read);
                     networkStream.Write("\r\n"u8.ToArray());
                 }
-            }
         }
     }
 

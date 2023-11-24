@@ -10,7 +10,8 @@ namespace EmailHandler
 
     public class Attachment
     {
-        public string Directory { get; set; }
+        public string? Directory { get; set; }
+        public string? FileName;
         public byte[]? Data { get; set; }
 
         public Attachment(string dir)
