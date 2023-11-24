@@ -1,20 +1,31 @@
 ﻿using EmailHandler;
 using SMTP;
+using POP3;
+using EmailSocket;
 class Program
 {
     static void Main(string[] args)
     {
-        Smtp_Client smtp = new Smtp_Client();
-        //Pop3_Client pop3 = new Pop3_Client();
+        ConfigJson config = ConfigJson.Load(Path.GetFullPath("Config.json"));
+
+        Smtp_Client smtp = new Smtp_Client(config);
+        Pop3_Client pop3 = new Pop3_Client(config);
+
         smtp.Connect();
-        Email mail = new Email("abc@xyz.com", "xyz@abc.com");
-        mail.To.Add("dnat@gmail.com");
+        Email mail = new Email("phuochoan17032004@gmail.com", "xyz@abc.com");
+        mail.To.Add("phuochoan17032004@gmail.com");
         mail.To.Add("asd@asd.com");
-        mail.CC.Add("dtna@gmail.com");
+        mail.Cc.Add("dtna@gmail.com");
+        mail.Bcc.Add("Hello@gmail.com");
         mail.Body = "This is bla bla bla";
-        mail.AddAttachment(@"D:\Uni\Yuusha.pdf");
-        mail.AddAttachment(@"D:\Uni\test.docx");
+        mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Instruction to nvim.txt");
+        mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Tài liệu\IT.docx");
         smtp.SendEmail(mail);
         smtp.Close();
+
+        pop3.Connect();
+        pop3.ReceiveEmail();
+        pop3.Close();
+    
     }
 }

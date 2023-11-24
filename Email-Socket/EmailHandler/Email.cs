@@ -10,8 +10,7 @@ namespace EmailHandler
 
     public class Attachment
     {
-        public string? Directory { get; set; }
-        public string? FileName;
+        public string Directory { get; set; }
         public byte[]? Data { get; set; }
 
         public Attachment(string dir)
@@ -25,8 +24,8 @@ namespace EmailHandler
         // Header
         public string From { get; set; }
         public List<string> To { get; set; }
-        public List<string> CC { get; set; }
-        public List<string> BCC { get; set; }
+        public List<string> Cc { get; set; }
+        public List<string> Bcc { get; set; }
         public string? Subject { get; set; }
         public string? Body { get; set; }
         public List<Attachment> Attachments { get; }
@@ -35,8 +34,8 @@ namespace EmailHandler
         {
             From = from;
             To = new List<string> { to };
-            CC = new List<string>();
-            BCC = new List<string>();
+            Cc = new List<string>();
+            Bcc = new List<string>();
             Attachments = new List<Attachment>();
 
         }
@@ -44,8 +43,8 @@ namespace EmailHandler
         public Email()
         {
             To = new List<string>();
-            CC = new List<string>();
-            BCC = new List<string>();
+            Cc = new List<string>();
+            Bcc = new List<string>();
             Attachments = new List<Attachment>();
         }
 
