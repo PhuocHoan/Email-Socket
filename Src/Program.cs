@@ -17,7 +17,7 @@ class Program
         mail.To.Add("levana@gmail.com");
         mail.To.Add("asd@asd.com");
         mail.Cc.Add("dtna@gmail.com");
-        mail.Bcc.Add("Hello@gmail.com");
+        mail.Bcc.Add("hophuochoan@gmail.com");
         mail.Subject = "Test";
         mail.Body = "This is bla bla bla";
         mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Instruction to nvim.txt");

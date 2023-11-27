@@ -213,7 +213,6 @@ namespace Email_Handler
                         }
                         // Decode base64
                         email.Attachments[i].Data = Convert.FromBase64String(AttachmentContent.ToString());
-                        // Save to file
                         ++i;
                     }
                     // 7 bit encoding

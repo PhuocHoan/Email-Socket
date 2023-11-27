@@ -107,8 +107,7 @@ namespace Email_Database
                 command.Parameters.AddWithValue("@MessageId", messageId);
 
                 // Execute the query and check if the email exists
-                int count = Convert.ToInt32(command.ExecuteScalar());
-                return count > 0;
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
             }
         }
 
@@ -121,8 +120,7 @@ namespace Email_Database
                 command.Parameters.AddWithValue("@FileName", fileName);
 
                 // Execute the query and check if the attachment exists
-                int count = Convert.ToInt32(command.ExecuteScalar());
-                return count > 0;
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
             }
         }
 

@@ -10,18 +10,20 @@ namespace Email_Pop3
 {   
     class Pop3_Client
     {
-        private static string connectionString = "Data Source=Emails.db";
-        public EmailDbContext dbContext = new EmailDbContext(connectionString);
+        public ConfigJson config;
+        private string connectionString;
+        public EmailDbContext dbContext;
         private Socket socket;
         private NetworkStream? networkStream;
         private StreamReader? streamReader;
         private StreamWriter? streamWriter;
         public IPAddress server;
         public short port;
-        public ConfigJson config;
         public Pop3_Client(ConfigJson config)
         {
             this.config = config;
+            connectionString = $"Data Source={getUserName()}";
+            dbContext = new EmailDbContext(connectionString);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server = IPAddress.Parse(config.General!.MailServer!);
             port = config.General!.Pop3Port!;
@@ -77,7 +79,6 @@ namespace Email_Pop3
             Mime.SaveFile(folderPath, emails[0].Attachments[0].FileName, emails[0].Attachments[0].Data);
             Mime.SaveFile(folderPath, emails[0].Attachments[1].FileName, emails[0].Attachments[1].Data);
             dbContext.UpdateAttachmentFilePath(emails[0].MessageId, folderPath);
-            
         }
         public void Close()
         {
@@ -87,6 +88,11 @@ namespace Email_Pop3
             streamWriter!.Close();
             streamReader!.Close();
             socket.Close();
+        }
+        private string getUserName()
+        {
+            Match match = Regex.Match(config.General!.Username!, "<(.+?)>");
+            return match.Groups[1].Value + ".db";
         }
     }
 }
