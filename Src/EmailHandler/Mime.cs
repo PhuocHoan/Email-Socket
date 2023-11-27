@@ -1,12 +1,8 @@
 using System.Text;
 using Microsoft.Win32;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-
-namespace EmailHandler
+namespace Email_Handler
 {
     public class Mime
     {
@@ -150,6 +146,13 @@ namespace EmailHandler
 
                     switch (headerName)
                     {
+                        case "Message-ID":
+                            Match match = Regex.Match(headerValue, "<(.+?)>");
+                            if (match.Success)
+                                email.MessageId = match.Groups[1].Value;
+                            else 
+                                email.MessageId = null;
+                            break;
                         case "From":
                             email.From = headerValue;
                             break;
@@ -186,7 +189,7 @@ namespace EmailHandler
             int i = 0; 
             // Parse part headers
             Dictionary<string, string> partHeaders = new Dictionary<string, string>();
-            while ((line = reader.ReadLine()) != boundary)
+            while (!string.IsNullOrEmpty(line = reader.ReadLine()))
             {
                 if (line.StartsWith("Content-Type:", StringComparison.OrdinalIgnoreCase))
                 {
@@ -211,7 +214,7 @@ namespace EmailHandler
                         // Decode base64
                         email.Attachments[i].Data = Convert.FromBase64String(AttachmentContent.ToString());
                         // Save to file
-                        File.WriteAllBytes(@$".\{email.Attachments[i].Directory}", email.Attachments[i].Data);
+                        // File.WriteAllBytes(@$".\{email.Attachments[i].FilePath}", email.Attachments[i].Data);
                         ++i;
                     }
                     // 7 bit encoding

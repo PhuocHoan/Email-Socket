@@ -1,34 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EmailHandler
+﻿namespace Email_Handler
 {
 
     public class Attachment
     {
-        public string Directory { get; set; }
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
         public byte[]? Data { get; set; }
 
         public Attachment(string dir)
         {
-            Directory = dir;
+            FileName = dir;
+            FilePath = Path.GetFullPath(dir);
         }
+        public Attachment() {}
 
     }
     public class Email
     {
         // Header
+        public string MessageId { get; set; }
         public string From { get; set; }
         public List<string> To { get; set; }
         public List<string> Cc { get; set; }
         public List<string> Bcc { get; set; }
         public string? Subject { get; set; }
         public string? Body { get; set; }
-        public List<Attachment> Attachments { get; }
+        public bool Status { get; set; }
+        public List<Attachment> Attachments { get; set; }
 
         public Email(string from, string to)
         {
@@ -59,6 +57,5 @@ namespace EmailHandler
             }
             else throw new FileNotFoundException();
         }
-
     }
 }

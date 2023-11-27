@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace EmailSocket
+namespace Email_Config
 {
     class GeneralSettings
     {

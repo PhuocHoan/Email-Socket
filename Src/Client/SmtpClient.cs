@@ -1,13 +1,11 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.IO;
-using EmailSocket;
-using EmailHandler;
+using Email_Config;
+using Email_Handler;
 using System.Security.Cryptography;
-using System;
 
-namespace SMTP
+namespace Email_Smtp
 {
     class Smtp_Client
     {
@@ -88,8 +86,8 @@ namespace SMTP
                 foreach (Attachment attachment in email.Attachments)
                 {
                     // Send header of each files
-                    streamWriter.WriteLine(Mime.GetMimePartHeader(randomBoundary, attachment.Directory));
-                    SendFile(attachment.Directory);
+                    streamWriter.WriteLine(Mime.GetMimePartHeader(randomBoundary, attachment.FilePath));
+                    SendFile(attachment.FilePath);
                 }
                 streamWriter.WriteLine();
                 streamWriter.WriteLine($"{randomBoundary}--");

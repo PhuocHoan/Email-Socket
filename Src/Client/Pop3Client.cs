@@ -1,14 +1,17 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using EmailHandler;
-using EmailSocket;
+using Email_Handler;
+using Email_Config;
 using System.Text.RegularExpressions;
+using Email_Database;
 
-namespace POP3
-{
+namespace Email_Pop3
+{   
     class Pop3_Client
     {
+        private static string connectionString = "Data Source=Emails.db";
+        public EmailDbContext dbContext = new EmailDbContext(connectionString);
         private Socket socket;
         private NetworkStream? networkStream;
         private StreamReader? streamReader;
@@ -66,8 +69,11 @@ namespace POP3
                     message += line + '\n';
                 }
                 Email email = Mime.MimeParser(message);
+                FilterEmail.Filter(email, config, dbContext);
             }
-
+            List<Email> emails = dbContext.GetEmailsByFolder("Project");
+            dbContext.UpdateEmailStatus(emails[0].MessageId, true);
+            dbContext.UpdateAttachmentFilePath(emails[0].MessageId, @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src");
         }
         public void Close()
         {
