@@ -214,7 +214,6 @@ namespace Email_Handler
                         // Decode base64
                         email.Attachments[i].Data = Convert.FromBase64String(AttachmentContent.ToString());
                         // Save to file
-                        // File.WriteAllBytes(@$".\{email.Attachments[i].FilePath}", email.Attachments[i].Data);
                         ++i;
                     }
                     // 7 bit encoding
@@ -249,5 +248,24 @@ namespace Email_Handler
                 return match.Groups[1].Value;
             return "";
         }
+
+        public static void SaveFile(string folderPath, string fileName, byte[] fileContent)
+        {
+            // Combine the folder path and file name to get the full path
+            string filePath = Path.Combine(folderPath, fileName);
+
+            // Check if the file already exists
+            if (File.Exists(filePath))
+            {
+                Console.WriteLine($"File '{fileName}' already exists in the folder. Choose a different name or handle accordingly.");
+            }
+            else
+            {
+                // Save the file
+                File.WriteAllBytes(filePath, fileContent);
+                Console.WriteLine($"File '{fileName}' saved to the folder.");
+            }
+        }
+
     }
 }

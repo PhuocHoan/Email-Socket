@@ -22,6 +22,7 @@ namespace Email_Config
         public GeneralSettings? General { get; set; }
         public List<Filter>? Filters { get; set; }
         
+        // Load data if not having config.json yet
         public static ConfigJson LoadData()
         {
             // if not having config.json yet, create one
@@ -102,6 +103,7 @@ namespace Email_Config
             return config;
         }
 
+        // change data if having config.json already
         public static void ChangeData(ref ConfigJson config) {
             // if having data from config.json already
             while (true) {
@@ -320,23 +322,24 @@ namespace Email_Config
             }
         }
 
+        // Load data from config.json
         public static ConfigJson Load(string file)
         {
             using FileStream stream = new(file, FileMode.Open, FileAccess.Read);
             return JsonSerializer.Deserialize<ConfigJson>(stream);
         }
 
+        // create new config.json if not having one and save data to it
         public static void SaveNewFile(string file, ConfigJson config)
         {
             using FileStream stream = new(file, FileMode.CreateNew, FileAccess.Write);
             JsonSerializer.Serialize(stream, config, new JsonSerializerOptions { WriteIndented = true, AllowTrailingCommas = true });
         }
-        
+        // save data to config.json
         public static void Save(string file, ConfigJson config)
         {
             using FileStream stream = new(file, FileMode.Truncate, FileAccess.Write);
             JsonSerializer.Serialize(stream, config, new JsonSerializerOptions { WriteIndented = true, AllowTrailingCommas = true });
         }
-
     }
 }

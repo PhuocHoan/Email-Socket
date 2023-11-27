@@ -72,25 +72,28 @@ namespace Email_Database
                         command.Parameters.AddWithValue("@Status", email.Status);
 
                         command.ExecuteNonQuery();
-                    }
-                }
+                        // Insert attachments into the common Attachments table
+                        foreach (var attachment in email.Attachments)
+                        {
+                            // Check if the attachment already exists
+                            bool attachmentExists = AttachmentExists(connection, email.MessageId, attachment.FileName);
+                            if (!attachmentExists) {
+                                using (SqliteCommand attachmentCommand = connection.CreateCommand())
+                                {
+                                    attachmentCommand.CommandText = $@"
+                                        INSERT INTO Attachments (MessageId, FileName, FilePath, Content)
+                                        VALUES (@MessageId, @FileName, @FilePath, @Content)
+                                    ";
 
-                // Insert attachments into the common Attachments table
-                foreach (var attachment in email.Attachments)
-                {
-                    using (SqliteCommand attachmentCommand = connection.CreateCommand())
-                    {
-                        attachmentCommand.CommandText = $@"
-                            INSERT INTO Attachments (MessageId, FileName, FilePath, Content)
-                            VALUES (@MessageId, @FileName, @FilePath, @Content)
-                        ";
+                                    attachmentCommand.Parameters.AddWithValue("@MessageId", email.MessageId);
+                                    attachmentCommand.Parameters.AddWithValue("@FileName", attachment.FileName);
+                                    attachmentCommand.Parameters.AddWithValue("@FilePath", attachment.FilePath);
+                                    attachmentCommand.Parameters.AddWithValue("@Content", attachment.Data != null ? attachment.Data : DBNull.Value); // Assuming Content is byte[]
 
-                        attachmentCommand.Parameters.AddWithValue("@MessageId", email.MessageId);
-                        attachmentCommand.Parameters.AddWithValue("@FileName", attachment.FileName);
-                        attachmentCommand.Parameters.AddWithValue("@FilePath", attachment.FilePath);
-                        attachmentCommand.Parameters.AddWithValue("@Content", attachment.Data != null ? attachment.Data : DBNull.Value); // Assuming Content is byte[]
-
-                        attachmentCommand.ExecuteNonQuery();
+                                    attachmentCommand.ExecuteNonQuery();
+                                }   
+                            }
+                        }
                     }
                 }
             }
@@ -104,6 +107,20 @@ namespace Email_Database
                 command.Parameters.AddWithValue("@MessageId", messageId);
 
                 // Execute the query and check if the email exists
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                return count > 0;
+            }
+        }
+
+        private bool AttachmentExists(SqliteConnection connection, string messageId, string fileName)
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Attachments WHERE MessageId = @MessageId AND FileName = @FileName";
+                command.Parameters.AddWithValue("@MessageId", messageId);
+                command.Parameters.AddWithValue("@FileName", fileName);
+
+                // Execute the query and check if the attachment exists
                 int count = Convert.ToInt32(command.ExecuteScalar());
                 return count > 0;
             }

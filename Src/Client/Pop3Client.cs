@@ -73,7 +73,11 @@ namespace Email_Pop3
             }
             List<Email> emails = dbContext.GetEmailsByFolder("Project");
             dbContext.UpdateEmailStatus(emails[0].MessageId, true);
-            dbContext.UpdateAttachmentFilePath(emails[0].MessageId, @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src");
+            string folderPath = @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src";
+            Mime.SaveFile(folderPath, emails[0].Attachments[0].FileName, emails[0].Attachments[0].Data);
+            Mime.SaveFile(folderPath, emails[0].Attachments[1].FileName, emails[0].Attachments[1].Data);
+            dbContext.UpdateAttachmentFilePath(emails[0].MessageId, folderPath);
+            
         }
         public void Close()
         {
