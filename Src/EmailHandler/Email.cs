@@ -3,8 +3,8 @@
 
     public class Attachment
     {
-        public string FilePath { get; set; }
-        public string FileName { get; set; }
+        public string? FilePath { get; set; }
+        public string? FileName { get; set; }
         public byte[]? Data { get; set; }
 
         public Attachment(string dir)
@@ -18,8 +18,8 @@
     public class Email
     {
         // Header
-        public string MessageId { get; set; }
-        public string From { get; set; }
+        public string? MessageId { get; set; }
+        public string? From { get; set; }
         public List<string> To { get; set; }
         public List<string> Cc { get; set; }
         public List<string> Bcc { get; set; }

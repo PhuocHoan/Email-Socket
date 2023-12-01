@@ -28,8 +28,8 @@ class Program
         mail.Bcc.Add("hophuochoan@gmail.com");
         mail.Subject = "ASAP";
         mail.Body = "This is ViRus haha report";
-        // mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Instruction to nvim.txt");
-        // mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Tài liệu\IT.docx");
+        mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Instruction to nvim.txt");
+        mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Tài liệu\IT.docx");
         // mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Object-oriented Programming\LN01 - Basic Concepts.pdf");
         // mail.AddAttachment(@"C:\Users\Phuoc Hoan\OneDrive\Pictures\Screenshots\Screenshot 2023-11-19 064152.png");
         // mail.AddAttachment(@"C:\Users\Phuoc Hoan\Downloads\Program\ChromeSetup.exe");

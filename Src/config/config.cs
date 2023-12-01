@@ -29,6 +29,7 @@ namespace Email_Config
         {
             ConfigJson config = new ConfigJson();
             config.General = new GeneralSettings();
+            config.Filters = new List<Filter>();
             config.General.Username = "levana@gmail.com";
             config.General.Password = "12345678";
             config.General.MailServer = "127.0.0.1";
@@ -36,24 +37,25 @@ namespace Email_Config
             config.General.Pop3Port = 110;
             config.General.AutoLoad = 10;
 
-            config.Filters = new List<Filter>();
             Filter filter = new Filter();
-
             filter.Criteria = "From";
             filter.Values = new List<string>() {"ahihi@testing.com", "ahuu@testing.com"};
             filter.Folder = "Project";
             config.Filters.Add(filter);
 
+            filter = new Filter();
             filter.Criteria = "Subject";
             filter.Values = new List<string>() {"urgent", "ASAP"};
             filter.Folder = "Important";
             config.Filters.Add(filter);
 
+            filter = new Filter();
             filter.Criteria = "Content";
             filter.Values = new List<string>() {"report", "meeting"};
             filter.Folder = "Work";
             config.Filters.Add(filter);
 
+            filter = new Filter();
             filter.Criteria = "Spam";
             filter.Values = new List<string>() {"virus", "hack", "crack"};
             filter.Folder = "Spam";
@@ -67,7 +69,7 @@ namespace Email_Config
         public static ConfigJson Load(string FileName)
         {
             using FileStream stream = new(FileName, FileMode.Open, FileAccess.Read);
-            return JsonSerializer.Deserialize<ConfigJson>(stream);
+            return JsonSerializer.Deserialize<ConfigJson>(stream)!;
         }
 
         // create new config.json if not having one and save data to it

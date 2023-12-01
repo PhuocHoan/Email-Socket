@@ -53,7 +53,7 @@ namespace Email_Database
                 using (SqliteCommand command = connection.CreateCommand())
                 {
                     // Check if the email already exists
-                    bool emailExists = EmailExists(connection, email.MessageId);
+                    bool emailExists = EmailExists(connection, email.MessageId!);
                     if (!emailExists) {
                         // If the email doesn't exist, insert it
                         command.CommandText = $@"
@@ -76,7 +76,7 @@ namespace Email_Database
                         foreach (var attachment in email.Attachments)
                         {
                             // Check if the attachment already exists
-                            bool attachmentExists = AttachmentExists(connection, email.MessageId, attachment.FileName);
+                            bool attachmentExists = AttachmentExists(connection, email.MessageId!, attachment.FileName!);
                             if (!attachmentExists) {
                                 using (SqliteCommand attachmentCommand = connection.CreateCommand())
                                 {
@@ -159,20 +159,20 @@ namespace Email_Database
                     {
                         while (reader.Read())
                         {
-                            string messageId = reader["MessageId"].ToString();
+                            string messageId = reader["MessageId"].ToString()!;
 
                             // Check if the email is already in the list
-                            Email email = emails.Find(e => e.MessageId == messageId);
+                            Email email = emails.Find(e => e.MessageId == messageId)!;
 
                             if (email == null)
                             {
                                 email = new Email
                                 {
                                     MessageId = messageId,
-                                    From = reader["FromAddress"].ToString(),
-                                    To = reader["ToAddresses"].ToString().Split(',').ToList(),
-                                    Cc = reader["CcAddresses"].ToString().Split(',').ToList(),
-                                    Bcc = reader["BccAddresses"].ToString().Split(',').ToList(),
+                                    From = reader["FromAddress"].ToString()!,
+                                    To = reader["ToAddresses"].ToString()!.Split(',').ToList(),
+                                    Cc = reader["CcAddresses"].ToString()!.Split(',').ToList(),
+                                    Bcc = reader["BccAddresses"].ToString()!.Split(',').ToList(),
                                     Subject = reader["Subject"].ToString(),
                                     Body = reader["Body"].ToString(),
                                     Attachments = new List<Attachment>()

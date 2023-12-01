@@ -22,7 +22,7 @@ namespace Email_Pop3
         public Pop3_Client(ConfigJson config)
         {
             this.config = config;
-            connectionString = $"Data Source={config.General.Username + ".db"}";
+            connectionString = $"Data Source={config.General!.Username + ".db"}";
             dbContext = new EmailDbContext(connectionString);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server = IPAddress.Parse(config.General!.MailServer!);
@@ -41,7 +41,7 @@ namespace Email_Pop3
         }
         public void ReceiveEmail() {
             // Send the USER command
-            Console.WriteLine(streamReader.ReadLine());
+            Console.WriteLine(streamReader!.ReadLine());
             streamWriter!.WriteLine($"USER {config.General!.Username}");
             Console.WriteLine(streamReader.ReadLine());
 
@@ -72,21 +72,21 @@ namespace Email_Pop3
                 Email email = Mime.MimeParser(message);
                 FilterEmail.Filter(email, config, dbContext);
                 streamWriter!.WriteLine($"DELE {i}");
-                // string response = streamReader.ReadLine();
+                Console.WriteLine(streamReader.ReadLine());
             }
-            List<Email> emails = dbContext.GetEmailsByFolder("Spam");
-            dbContext.UpdateEmailStatus(emails[0].MessageId, true);
+            List<Email> emails = dbContext.GetEmailsByFolder("Important");
+            dbContext.UpdateEmailStatus(emails[0].MessageId!, true);
             string folderPath = @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src";
             foreach (var attachment in emails[0].Attachments)
             {
-                attachment.FilePath = Path.Combine(folderPath, attachment.FileName);
-                File.WriteAllBytes(attachment.FilePath, attachment.Data);
+                attachment.FilePath = Path.Combine(folderPath, attachment.FileName!);
+                File.WriteAllBytes(attachment.FilePath, attachment.Data!);
             }
-            dbContext.UpdateAttachmentFilePath(emails[0].MessageId, folderPath);
+            dbContext.UpdateAttachmentFilePath(emails[0].MessageId!, folderPath);
         }
         public void Close()
         {
-            streamWriter.WriteLine("QUIT");
+            streamWriter!.WriteLine("QUIT");
             Console.WriteLine(streamReader!.ReadLine());
             networkStream!.Close();
             streamWriter!.Close();

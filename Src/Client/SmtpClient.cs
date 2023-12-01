@@ -36,7 +36,7 @@ namespace Email_Smtp
 
         public void Close()
         {
-            streamWriter.WriteLine("QUIT");
+            streamWriter!.WriteLine("QUIT");
             Console.WriteLine(streamReader!.ReadLine());
             networkStream!.Close();
             streamReader!.Close();
@@ -49,8 +49,7 @@ namespace Email_Smtp
             if (!socket.Connected)
                 throw new Exception("Haven't connected to the server!");
 
-            string? response;
-            Console.WriteLine(streamReader.ReadLine());
+            Console.WriteLine(streamReader!.ReadLine());
             streamWriter!.WriteLine("EHLO example.com");
             Console.WriteLine(streamReader.ReadLine());
             
@@ -87,7 +86,7 @@ namespace Email_Smtp
                 {
                     // Send header of each files
                     streamWriter.WriteLine(Mime.GetMimePartHeader(randomBoundary, attachment.FilePath));
-                    SendFile(attachment.FilePath);
+                    SendFile(attachment.FilePath!);
                 }
                 streamWriter.WriteLine();
                 streamWriter.WriteLine($"{randomBoundary}--");

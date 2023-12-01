@@ -50,7 +50,7 @@ namespace Email_Handler
         public static string GetMainHeader(Email email, string boundary)
         {
             StringBuilder header = new StringBuilder();
-            header.AppendLine($"Message-ID: <{Guid.NewGuid()}@{email.From.Split(new[] { '@' }, 2)[1]}>");
+            header.AppendLine($"Message-ID: <{Guid.NewGuid()}@{email.From!.Split(new[] { '@' }, 2)[1]}>");
 
             // Get the local time zone & format
             TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
@@ -136,7 +136,7 @@ namespace Email_Handler
 
             // Parse headers
             string line;
-            while (!string.IsNullOrEmpty(line = reader.ReadLine()))
+            while (!string.IsNullOrEmpty(line = reader.ReadLine()!))
             {
                 string[] headerParts = line.Split(new[] { ':' }, 2);
                 if (headerParts.Length == 2)
@@ -183,13 +183,13 @@ namespace Email_Handler
         private static void ParseMultipartMixed(StringReader reader, Email email, string boundary)
         {
             // Skip until the boundary
-            while (!reader.ReadLine().StartsWith(boundary)) { }
+            while (!reader.ReadLine()!.StartsWith(boundary)) { }
             string line;
             // define index of attachment
             int i = 0; 
             // Parse part headers
             Dictionary<string, string> partHeaders = new Dictionary<string, string>();
-            while (!string.IsNullOrEmpty(line = reader.ReadLine()))
+            while (!string.IsNullOrEmpty(line = reader.ReadLine()!))
             {
                 if (line.StartsWith("Content-Type:", StringComparison.OrdinalIgnoreCase))
                 {
@@ -205,7 +205,7 @@ namespace Email_Handler
                         reader.ReadLine();
                         // Parse part body
                         StringBuilder AttachmentContent = new StringBuilder();
-                        while ((line = reader.ReadLine()) != boundary){
+                        while ((line = reader.ReadLine()!) != boundary){
                             if (line == boundary + "--") {
                                 break;
                             }
@@ -221,7 +221,7 @@ namespace Email_Handler
                         reader.ReadLine();
                         // Parse part body
                         StringBuilder body = new StringBuilder();
-                        while ((line = reader.ReadLine()) != boundary)
+                        while ((line = reader.ReadLine()!) != boundary)
                             body.Append(line);
                         email.Body = body.ToString();
                     }
