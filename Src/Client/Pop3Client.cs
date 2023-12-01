@@ -22,7 +22,7 @@ namespace Email_Pop3
         public Pop3_Client(ConfigJson config)
         {
             this.config = config;
-            connectionString = $"Data Source={getUserName()}";
+            connectionString = $"Data Source={config.General.Username + ".db"}";
             dbContext = new EmailDbContext(connectionString);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server = IPAddress.Parse(config.General!.MailServer!);
@@ -42,8 +42,7 @@ namespace Email_Pop3
         public void ReceiveEmail() {
             // Send the USER command
             Console.WriteLine(streamReader.ReadLine());
-            Match match = Regex.Match(config.General!.Username!, "<(.+?)>");
-            streamWriter!.WriteLine($"USER {match.Groups[1].Value}");
+            streamWriter!.WriteLine($"USER {config.General!.Username}");
             Console.WriteLine(streamReader.ReadLine());
 
             // Send the PASS command
@@ -72,12 +71,17 @@ namespace Email_Pop3
                 }
                 Email email = Mime.MimeParser(message);
                 FilterEmail.Filter(email, config, dbContext);
+                streamWriter!.WriteLine($"DELE {i}");
+                // string response = streamReader.ReadLine();
             }
-            List<Email> emails = dbContext.GetEmailsByFolder("Project");
+            List<Email> emails = dbContext.GetEmailsByFolder("Spam");
             dbContext.UpdateEmailStatus(emails[0].MessageId, true);
             string folderPath = @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src";
-            Mime.SaveFile(folderPath, emails[0].Attachments[0].FileName, emails[0].Attachments[0].Data);
-            Mime.SaveFile(folderPath, emails[0].Attachments[1].FileName, emails[0].Attachments[1].Data);
+            foreach (var attachment in emails[0].Attachments)
+            {
+                attachment.FilePath = Path.Combine(folderPath, attachment.FileName);
+                File.WriteAllBytes(attachment.FilePath, attachment.Data);
+            }
             dbContext.UpdateAttachmentFilePath(emails[0].MessageId, folderPath);
         }
         public void Close()
@@ -88,11 +92,6 @@ namespace Email_Pop3
             streamWriter!.Close();
             streamReader!.Close();
             socket.Close();
-        }
-        private string getUserName()
-        {
-            Match match = Regex.Match(config.General!.Username!, "<(.+?)>");
-            return match.Groups[1].Value + ".db";
         }
     }
 }

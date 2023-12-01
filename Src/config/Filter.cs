@@ -20,24 +20,25 @@ namespace Email_Config
                 }
             }
             if (!ok)
-                dbContext.AddEmail(email, "MessageBox");
+                dbContext.AddEmail(email, "Inbox");
         }
         private static bool FilterMatches(Email email, Filter filter)
         {
             switch (filter.Criteria)
             {
                 case "From":
-                    return filter.Values.Contains(email.From);
+                    return filter.Values.Any(value => email.From.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 case "Subject":
-                    return filter.Values.Contains(email.Subject, StringComparer.OrdinalIgnoreCase);
+                    return filter.Values.Any(value => email.Subject.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 case "Content":
-                    return filter.Values.Any(value => email.Body.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    return filter.Values.Any(value => email.Body.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 case "Spam":
-                    // Example: Check if any of the values appear in the email body
-                    return filter.Values.Any(value => email.Body.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    // Example: Check if any of the values appear in the email body or subject
+                    return filter.Values.Any(value => email.Body.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                           filter.Values.Any(value => email.Subject.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 default:
                     // Handle unknown criteria

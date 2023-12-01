@@ -107,7 +107,8 @@ namespace Email_Database
                 command.Parameters.AddWithValue("@MessageId", messageId);
 
                 // Execute the query and check if the email exists
-                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+                int cnt = Convert.ToInt32(command.ExecuteScalar());
+                return cnt > 0;
             }
         }
 
