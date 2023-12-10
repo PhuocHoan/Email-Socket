@@ -1,7 +1,7 @@
+using EmailHandler;
 using Microsoft.Data.Sqlite;
-using Email_Handler;
 
-namespace Email_Database
+namespace EmailDatabase
 {
     public class EmailDbContext
     {
@@ -21,21 +21,21 @@ namespace Email_Database
                     command.CommandText = @"
                         CREATE TABLE IF NOT EXISTS Emails (
                             MessageId TEXT PRIMARY KEY,
-                            Folder TEXT,
-                            FromAddress TEXT,
+                            Folder TEXT NOT NULL,
+                            FromAddress TEXT NOT NULL,
                             ToAddresses TEXT,
                             CcAddresses TEXT,
-                            BccAddresses TEXT,
                             Subject TEXT,
                             Body TEXT,
-                            Status INTEGER
+                            Status INTEGER NOT NULL CHECK (Status IN (0, 1))
                         );
 
                         CREATE TABLE IF NOT EXISTS Attachments (
                             MessageId TEXT,
-                            FileName TEXT,
+                            FileName TEXT NOT NULL,
                             FilePath TEXT,
                             Content BLOB,
+                            PRIMARY KEY (MessageId, FileName),
                             FOREIGN KEY (MessageId) REFERENCES Emails (MessageId)
                         );
                     ";
@@ -54,19 +54,19 @@ namespace Email_Database
                 {
                     // Check if the email already exists
                     bool emailExists = EmailExists(connection, email.MessageId!);
-                    if (!emailExists) {
+                    if (!emailExists)
+                    {
                         // If the email doesn't exist, insert it
                         command.CommandText = $@"
-                            INSERT INTO Emails (MessageId, Folder, FromAddress, ToAddresses, CcAddresses, BccAddresses, Subject, Body, Status)
-                            VALUES (@MessageId, @Folder, @FromAddress, @ToAddresses, @CcAddresses, @BccAddresses, @Subject, @Body, @Status)
+                            INSERT INTO Emails (MessageId, Folder, FromAddress, ToAddresses, CcAddresses, Subject, Body, Status)
+                            VALUES (@MessageId, @Folder, @FromAddress, @ToAddresses, @CcAddresses, @Subject, @Body, @Status)
                         ";
 
                         command.Parameters.AddWithValue("@MessageId", email.MessageId);
                         command.Parameters.AddWithValue("@Folder", folder); // This is where the folder information is inserted
                         command.Parameters.AddWithValue("@FromAddress", email.From);
-                        command.Parameters.AddWithValue("@ToAddresses", email.To != null ? string.Join(",", email.To) : DBNull.Value);
-                        command.Parameters.AddWithValue("@CcAddresses", email.Cc != null ? string.Join(",", email.Cc) : DBNull.Value);
-                        command.Parameters.AddWithValue("@BccAddresses", email.Bcc != null ? string.Join(",", email.Bcc) : DBNull.Value);
+                        command.Parameters.AddWithValue("@ToAddresses", (email.To.Count > 0) ? string.Join(",", email.To) : DBNull.Value);
+                        command.Parameters.AddWithValue("@CcAddresses", (email.Cc!.Count > 0) ? string.Join(",", email.Cc) : DBNull.Value);
                         command.Parameters.AddWithValue("@Subject", email.Subject != null ? email.Subject : DBNull.Value);
                         command.Parameters.AddWithValue("@Body", email.Body != null ? email.Body : DBNull.Value);
                         command.Parameters.AddWithValue("@Status", email.Status);
@@ -77,7 +77,8 @@ namespace Email_Database
                         {
                             // Check if the attachment already exists
                             bool attachmentExists = AttachmentExists(connection, email.MessageId!, attachment.FileName!);
-                            if (!attachmentExists) {
+                            if (!attachmentExists)
+                            {
                                 using (SqliteCommand attachmentCommand = connection.CreateCommand())
                                 {
                                     attachmentCommand.CommandText = $@"
@@ -91,7 +92,7 @@ namespace Email_Database
                                     attachmentCommand.Parameters.AddWithValue("@Content", attachment.Data != null ? attachment.Data : DBNull.Value); // Assuming Content is byte[]
 
                                     attachmentCommand.ExecuteNonQuery();
-                                }   
+                                }
                             }
                         }
                     }
@@ -141,10 +142,10 @@ namespace Email_Database
                             e.FromAddress, 
                             e.ToAddresses, 
                             e.CcAddresses,
-                            e.BccAddresses,
                             e.Subject, 
                             e.Body, 
                             e.Folder,
+                            e.Status,
                             a.FileName,
                             a.FilePath,
                             a.Content
@@ -166,15 +167,16 @@ namespace Email_Database
 
                             if (email == null)
                             {
+                                string? cc = reader["CcAddresses"].ToString();
                                 email = new Email
                                 {
                                     MessageId = messageId,
                                     From = reader["FromAddress"].ToString()!,
                                     To = reader["ToAddresses"].ToString()!.Split(',').ToList(),
-                                    Cc = reader["CcAddresses"].ToString()!.Split(',').ToList(),
-                                    Bcc = reader["BccAddresses"].ToString()!.Split(',').ToList(),
+                                    Cc = !string.IsNullOrEmpty(cc) ? cc.Split(',').ToList() : new List<string>(),
                                     Subject = reader["Subject"].ToString(),
                                     Body = reader["Body"].ToString(),
+                                    Status = reader["Status"].ToString()!.Equals("0") ? false : true,
                                     Attachments = new List<Attachment>()
                                 };
 

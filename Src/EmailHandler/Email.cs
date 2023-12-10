@@ -1,19 +1,20 @@
-﻿namespace Email_Handler
+﻿namespace EmailHandler
 {
-
     public class Attachment
     {
         public string? FilePath { get; set; }
         public string? FileName { get; set; }
         public byte[]? Data { get; set; }
-
         public Attachment(string dir)
         {
             FileName = dir;
             FilePath = Path.GetFullPath(dir);
         }
-        public Attachment() {}
-
+        public Attachment() 
+        {
+            FilePath = null;
+            FileName = null;
+        }
     }
     public class Email
     {
@@ -21,13 +22,12 @@
         public string? MessageId { get; set; }
         public string? From { get; set; }
         public List<string> To { get; set; }
-        public List<string> Cc { get; set; }
-        public List<string> Bcc { get; set; }
+        public List<string>? Cc { get; set; }
+        public List<string>? Bcc { get; set; }
         public string? Subject { get; set; }
         public string? Body { get; set; }
         public bool Status { get; set; }
         public List<Attachment> Attachments { get; set; }
-
         public Email(string from, string to)
         {
             From = from;
@@ -37,15 +37,14 @@
             Attachments = new List<Attachment>();
 
         }
-
         public Email()
         {
+            From = null;
             To = new List<string>();
             Cc = new List<string>();
             Bcc = new List<string>();
             Attachments = new List<Attachment>();
         }
-
         public void AddAttachment(string fileName)
         {
             FileInfo file = new(fileName);

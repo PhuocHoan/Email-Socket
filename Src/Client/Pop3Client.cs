@@ -1,58 +1,58 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Email_Handler;
-using Email_Config;
-using System.Text.RegularExpressions;
-using Email_Database;
+using EmailConfig;
+using EmailDatabase;
+using EmailHandler;
 
-namespace Email_Pop3
-{   
+namespace EmailClient
+{
     class Pop3_Client
     {
         public ConfigJson config;
         private string connectionString;
         public EmailDbContext dbContext;
-        private Socket socket;
         private NetworkStream? networkStream;
         private StreamReader? streamReader;
         private StreamWriter? streamWriter;
         public IPAddress server;
         public short port;
+
         public Pop3_Client(ConfigJson config)
         {
             this.config = config;
-            connectionString = $"Data Source={config.General!.Username + ".db"}";
+            connectionString = $"Data Source=.\\Data\\{config.General!.Username}.db";
             dbContext = new EmailDbContext(connectionString);
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server = IPAddress.Parse(config.General!.MailServer!);
             port = config.General!.Pop3Port!;
         }
-        public void Connect()
+
+        public void Connect(Socket socket)
         {
             socket.Connect(server, port);
             networkStream = new NetworkStream(socket);
             streamReader = new StreamReader(networkStream, Encoding.ASCII);
             streamWriter = new StreamWriter(networkStream, Encoding.ASCII) { AutoFlush = true };
-
-            // Check if the connection is successful
-            if (!socket.Connected)
-                throw new Exception("Failed connecting to server!");
+            streamReader.ReadLine();
         }
-        public void ReceiveEmail() {
+
+        public void ReceiveEmail()
+        {
+            using Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Connect(socket);
             // Send the USER command
-            Console.WriteLine(streamReader!.ReadLine());
+            //Console.WriteLine(streamReader!.ReadLine());
             streamWriter!.WriteLine($"USER {config.General!.Username}");
-            Console.WriteLine(streamReader.ReadLine());
+            streamReader!.ReadLine();
 
             // Send the PASS command
             streamWriter!.WriteLine($"PASS {config.General!.Password}");
-            Console.WriteLine(streamReader.ReadLine());
+            streamReader.ReadLine();
 
             // Send the STAT command to get the number of messages in the mailbox
             streamWriter!.WriteLine("STAT");
             string? statResponse = streamReader.ReadLine();
-            Console.WriteLine(statResponse);
+
             // Extract the number of messages from the STAT response
             int messageCount = int.Parse(statResponse!.Split(' ')[1]);
 
@@ -60,38 +60,54 @@ namespace Email_Pop3
             {
                 // Send the RETR command to retrieve the i-th message
                 streamWriter!.WriteLine($"RETR {i}");
-                Console.WriteLine(streamReader.ReadLine());
+                streamReader!.ReadLine();
+
+                string? line;
                 string message = "";
+
+                // This is for handling time-out connection while processing large emails
+                bool isDone = false;
+                Task refresh = new Task(
+                    () =>
+                    {
+                        while (!isDone)
+                        {
+                            streamWriter!.WriteLine($"NOOP");
+                            streamReader!.ReadLine();
+                            // task sleep for 10 seconds
+                            Thread.Sleep(10000);
+                        }
+                    }
+                );
+
+                refresh.Start();
                 while (true)
                 {
-                    string? line = streamReader.ReadLine();
+                    line = streamReader.ReadLine();
                     if (line == ".")
                         break;
                     message += line + '\n';
                 }
+                isDone = true;
+
+                streamWriter!.WriteLine($"DELE {i}");
+                streamReader.ReadLine();
                 Email email = Mime.MimeParser(message);
                 FilterEmail.Filter(email, config, dbContext);
-                streamWriter!.WriteLine($"DELE {i}");
-                Console.WriteLine(streamReader.ReadLine());
             }
-            List<Email> emails = dbContext.GetEmailsByFolder("Important");
-            dbContext.UpdateEmailStatus(emails[0].MessageId!, true);
-            string folderPath = @"C:\Users\Phuoc Hoan\OneDrive - VNU-HCMUS\Work Space\My Uni\2nd year\4th Semester\Computer Networking\Lab\Project1 Socket\Email-Socket\Src";
-            foreach (var attachment in emails[0].Attachments)
-            {
-                attachment.FilePath = Path.Combine(folderPath, attachment.FileName!);
-                File.WriteAllBytes(attachment.FilePath, attachment.Data!);
-            }
-            dbContext.UpdateAttachmentFilePath(emails[0].MessageId!, folderPath);
+            streamWriter!.WriteLine($"QUIT");
+            streamReader.ReadLine();
+            Close(socket);
         }
-        public void Close()
+
+        public void Close(Socket socket)
         {
-            streamWriter!.WriteLine("QUIT");
-            Console.WriteLine(streamReader!.ReadLine());
             networkStream!.Close();
             streamWriter!.Close();
             streamReader!.Close();
+            socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
+
     }
 }

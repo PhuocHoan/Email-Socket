@@ -1,43 +1,44 @@
 using System.Text;
-using Microsoft.Win32;
 using System.Text.RegularExpressions;
 
-namespace Email_Handler
+namespace EmailHandler
 {
     public class Mime
     {
-        private static IDictionary<string, string> ContentType = new Dictionary<string, string>
+        private static Dictionary<string, string> ContentType = new Dictionary<string, string>
         {
-            {".txt", "text/plain"},
+            {".7z", "application/x-7z-compressed"},
+            {".bin", "application/octet-stream"},
+            {".csv", "text/csv"},
             {".doc", "application/msword"},
             {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {".mp3", "audio/mpeg"},
-            {".wav", "audio/wav"},
+            {".gif", "image/gif"},
+            {".jar", "application/java-archive"},
             {".jpe", "image/jpeg"},
             {".jpeg", "image/jpeg"},
             {".jpg", "image/jpeg"},
-            {".png", "image/png"},
+            {".json", "application/json"},
+            {".mp3", "audio/mpeg"},
+            {".mp4", "video/mp4"},
             {".pdf", "application/pdf"},
-            {".7z", "application/x-7z-compressed"},
-            {".bin", "application/octet-stream"},
-            {".zip", "application/x-zip-compressed"},
-            {".rar", "application/octet-stream"},
+            {".png", "image/png"},
+            {".ppt", "application/vnd.ms-powerpoint"},
             {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+            {".rar", "application/octet-stream"},
+            {".tar", "application/x-tar"},
+            {".txt", "text/plain"},
+            {".wav", "audio/wav"},
+            {".xls", "application/vnd.ms-excel"},
+            {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {".zip", "application/x-zip-compressed"},
         };
 
         public static string GetFileContentType(string fileName)
         {
             string? extension = Path.GetExtension(fileName).ToLower();
-            return ContentType.TryGetValue(extension, out string? result) ? result : "unknown";
-        }
-
-        // Might not work on other OS
-        public static string? GetFileExtension(string mimeType)
-        {
-            var key = Registry.ClassesRoot.OpenSubKey(@"MIME\Database\Content Type\" + mimeType, false);
-            var value = key?.GetValue("Extension", null);
-
-            return value?.ToString();
+            if (ContentType.TryGetValue(extension, out string? result))
+                return result;
+            else throw new NotSupportedException();
         }
 
         public static string GetEmailContentType(Email email)
@@ -62,21 +63,18 @@ namespace Email_Handler
             header.AppendLine("MIME-Version: 1.0");
             header.AppendLine($"From: {email.From}");
 
-            if (email.To.Count > 0) {
-                header.Append($"To: ");
-                for (int i = 0; i < email.To.Count; ++i)
-                {
-                    header.Append($"{email.To[i]}");
-                    if (i != email.To.Count - 1)
-                        header.Append(", ");
-                }
-                header.AppendLine();
-            }
-
-            if (email.Cc.Count > 0)
-            header.Append($"Cc: ");
-            if (email.Cc.Count > 0)
+            header.Append($"To: ");
+            for (int i = 0; i < email.To.Count; ++i)
             {
+                header.Append($"{email.To[i]}");
+                if (i != email.To.Count - 1)
+                    header.Append(", ");
+            }
+            header.AppendLine();
+
+            if (email.Cc!.Count > 0)
+            {
+                header.Append($"Cc: ");
                 for (int i = 0; i < email.Cc.Count; ++i)
                 {
                     header.Append($"{email.Cc[i]}");
@@ -86,18 +84,7 @@ namespace Email_Handler
                 header.AppendLine();
             }
 
-            if (email.Bcc.Count > 0)
-            {
-                header.Append($"Bcc: ");
-                for (int i = 0; i < email.Bcc.Count; ++i)
-                {
-                    header.Append($"{email.Bcc[i]}");
-                    if (i != email.Bcc.Count - 1)
-                        header.Append(", ");
-                }
-                header.AppendLine();
-            }   
-            if (email.Subject != null)
+            if (!string.IsNullOrEmpty(email.Subject))
                 header.AppendLine($"Subject: {email.Subject}");
             string emailContentType = GetEmailContentType(email);
             if (emailContentType.Equals("text/plain"))
@@ -107,25 +94,30 @@ namespace Email_Handler
             }
             else
                 header.AppendLine($"Content-Type: multipart/mixed; boundary=\"{boundary}\"");
+            header.AppendLine();
+
             return header.ToString();
         }
 
-        public static string GetMimePartHeader(string boundary, string? fileName = null, bool isFile = true)
+        public static string GetMimePartHeader(string boundary, string? fileName, bool isFile = true)
         {
             StringBuilder header = new StringBuilder();
 
-            header.AppendLine($"{boundary}");
+            header.AppendLine($"--{boundary}");
             if (isFile)
             {
-                header.AppendLine($"Content-Type: {GetFileContentType(fileName!)};{(GetFileContentType(fileName!) == "text/plain" ? " charset=UTF-8;" : "")} name=\"{Path.GetFileName(fileName)}\"");
+                header.AppendLine($"Content-Type: {GetFileContentType(fileName!)}; name=\"{Path.GetFileName(fileName)}\"");
                 header.AppendLine($"Content-Disposition: attachment; filename=\"{Path.GetFileName(fileName)}\"");
-                header.AppendLine($"Content-Transfer-Encoding: base64");
+                header.AppendLine($"Content-Transfer-Encoding: {(GetFileContentType(fileName!).Equals("text/plain") ? "7bit" : "base64")}");
             }
             else
             {
                 header.AppendLine($"Content-Type: text/plain; charset=UTF-8; format=flowed");
                 header.AppendLine("Content-Transfer-Encoding: 7bit");
             }
+
+            header.AppendLine();
+
             return header.ToString();
         }
 
@@ -150,7 +142,7 @@ namespace Email_Handler
                             Match match = Regex.Match(headerValue, "<(.+?)>");
                             if (match.Success)
                                 email.MessageId = match.Groups[1].Value;
-                            else 
+                            else
                                 email.MessageId = null;
                             break;
                         case "From":
@@ -160,10 +152,10 @@ namespace Email_Handler
                             email.To.AddRange(headerValue.Split(',').Select(address => address.Trim()));
                             break;
                         case "Cc":
-                            email.Cc.AddRange(headerValue.Split(',').Select(address => address.Trim()));
+                            email.Cc!.AddRange(headerValue.Split(',').Select(address => address.Trim()));
                             break;
                         case "Bcc":
-                            email.Bcc.AddRange(headerValue.Split(',').Select(address => address.Trim()));
+                            email.Bcc!.AddRange(headerValue.Split(',').Select(address => address.Trim()));
                             break;
                         case "Subject":
                             email.Subject = headerValue;
@@ -171,7 +163,12 @@ namespace Email_Handler
                         case "Content-Type":
                             if (headerValue.StartsWith("multipart/mixed", StringComparison.OrdinalIgnoreCase))
                                 // Handle multipart/mixed
-                                ParseMultipartMixed(reader, email, GetBoundary(line));
+                                ParseMultipartMixed(new StringReader(mimeMessage), email, GetBoundary(line));
+                            else
+                            {
+                                // Simply just search for the body part
+                                ParseSimplePart(new StringReader(mimeMessage), email);
+                            }
                             break;
                     }
                 }
@@ -180,16 +177,30 @@ namespace Email_Handler
             return email;
         }
 
+        private static void ParseSimplePart(StringReader reader, Email email)
+        {
+            // Skip until the body
+            string? line;
+            while (!string.IsNullOrEmpty(line = reader.ReadLine())) { }
+
+            // Parse part body
+            string body = reader.ReadToEnd();
+            email.Body = body;
+        }
+
         private static void ParseMultipartMixed(StringReader reader, Email email, string boundary)
         {
             // Skip until the boundary
-            while (!reader.ReadLine()!.StartsWith(boundary)) { }
-            string line;
+            string? line;
+            do
+            {
+                line = reader.ReadLine();
+            } while (string.IsNullOrEmpty(line) ? true : !line.StartsWith("--" + boundary));
             // define index of attachment
-            int i = 0; 
+            int i = 0;
             // Parse part headers
             Dictionary<string, string> partHeaders = new Dictionary<string, string>();
-            while (!string.IsNullOrEmpty(line = reader.ReadLine()!))
+            while (!string.IsNullOrEmpty(line = reader.ReadLine()))
             {
                 if (line.StartsWith("Content-Type:", StringComparison.OrdinalIgnoreCase))
                 {
@@ -205,8 +216,10 @@ namespace Email_Handler
                         reader.ReadLine();
                         // Parse part body
                         StringBuilder AttachmentContent = new StringBuilder();
-                        while ((line = reader.ReadLine()!) != boundary){
-                            if (line == boundary + "--") {
+                        while ((line = reader.ReadLine()) != ("--" + boundary))
+                        {
+                            if (line == "--" + boundary + "--")
+                            {
                                 break;
                             }
                             AttachmentContent.Append(line);
@@ -216,13 +229,14 @@ namespace Email_Handler
                         ++i;
                     }
                     // 7 bit encoding
-                    else {
+                    else
+                    {
                         // Skip 1 line
                         reader.ReadLine();
                         // Parse part body
                         StringBuilder body = new StringBuilder();
-                        while ((line = reader.ReadLine()!) != boundary)
-                            body.Append(line);
+                        while ((line = reader.ReadLine()) != ("--" + boundary))
+                            body.AppendLine(line);
                         email.Body = body.ToString();
                     }
                 }
@@ -237,7 +251,7 @@ namespace Email_Handler
                     }
                 }
             }
-        }    
+        }
 
         static string GetBoundary(string line)
         {
@@ -248,21 +262,29 @@ namespace Email_Handler
             return "";
         }
 
-        public static void SaveFile(string folderPath, string fileName, byte[] fileContent)
+        public static bool SaveFile(string folderPath, string fileName, byte[] fileContent)
         {
             // Combine the folder path and file name to get the full path
             string filePath = Path.Combine(folderPath, fileName);
+
+            if (!Directory.Exists(folderPath))
+            {
+                Console.WriteLine("Can't find the folder! Please try again.");
+                return false;
+            }
 
             // Check if the file already exists
             if (File.Exists(filePath))
             {
                 Console.WriteLine($"File '{fileName}' already exists in the folder. Choose a different name or handle accordingly.");
+                return false;
             }
             else
             {
                 // Save the file
                 File.WriteAllBytes(filePath, fileContent);
                 Console.WriteLine($"File '{fileName}' saved to the folder.");
+                return true;
             }
         }
 

@@ -1,7 +1,7 @@
-using Email_Handler;
-using Email_Database;
+using EmailDatabase;
+using EmailHandler;
 
-namespace Email_Config
+namespace EmailConfig
 {
     class FilterEmail
     {
@@ -27,18 +27,18 @@ namespace Email_Config
             switch (filter.Criteria)
             {
                 case "From":
-                    return filter.Values!.Any(value => email.From!.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
+                    return filter.Values?.Any(value => email.From?.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) ?? false;
 
                 case "Subject":
-                    return filter.Values!.Any(value => email.Subject!.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
+                    return filter.Values!.Any(value => email.Subject?.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 case "Content":
-                    return filter.Values!.Any(value => email.Body!.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
+                    return filter.Values!.Any(value => email.Body?.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 case "Spam":
                     // Example: Check if any of the values appear in the email body or subject
-                    return filter.Values!.Any(value => email.Body!.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                           filter.Values!.Any(value => email.Subject!.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
+                    return filter.Values!.Any(value => email.Body?.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                           filter.Values!.Any(value => email.Subject?.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0);
 
                 default:
                     // Handle unknown criteria

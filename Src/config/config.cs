@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Email_Config
+namespace EmailConfig
 {
     class GeneralSettings
     {
@@ -18,7 +18,7 @@ namespace Email_Config
         public List<string>? Values { get; set; }
         public string? Folder { get; set; }
     }
-    
+
     class ConfigJson
     {
         public GeneralSettings? General { get; set; }
@@ -39,25 +39,25 @@ namespace Email_Config
 
             Filter filter = new Filter();
             filter.Criteria = "From";
-            filter.Values = new List<string>() {"ahihi@testing.com", "ahuu@testing.com"};
+            filter.Values = new List<string>() { "ahihi@testing.com", "ahuu@testing.com" };
             filter.Folder = "Project";
             config.Filters.Add(filter);
 
             filter = new Filter();
             filter.Criteria = "Subject";
-            filter.Values = new List<string>() {"urgent", "ASAP"};
+            filter.Values = new List<string>() { "urgent", "ASAP" };
             filter.Folder = "Important";
             config.Filters.Add(filter);
 
             filter = new Filter();
             filter.Criteria = "Content";
-            filter.Values = new List<string>() {"report", "meeting"};
+            filter.Values = new List<string>() { "report", "meeting" };
             filter.Folder = "Work";
             config.Filters.Add(filter);
 
             filter = new Filter();
             filter.Criteria = "Spam";
-            filter.Values = new List<string>() {"virus", "hack", "crack"};
+            filter.Values = new List<string>() { "virus", "hack", "crack" };
             filter.Folder = "Spam";
             config.Filters.Add(filter);
 
